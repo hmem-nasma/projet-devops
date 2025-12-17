@@ -1,0 +1,95 @@
+############################
+# CORE PIPELINE (MANDATORY)
+############################
+workflow-api
+workflow-step-api
+workflow-support
+workflow-job
+workflow-scm-step
+workflow-cps
+workflow-durable-task-step
+workflow-basic-steps
+workflow-multibranch
+workflow-aggregator
+
+pipeline-build-step
+pipeline-input-step
+pipeline-milestone-step
+pipeline-stage-step
+pipeline-groovy-lib
+pipeline-model-api
+pipeline-model-extensions
+pipeline-model-definition
+
+############################
+# SCM & SOURCE CONTROL
+############################
+scm-api
+git-client
+git
+
+############################
+# CREDENTIALS & SECURITY
+############################
+credentials
+credentials-binding
+plain-credentials
+ssh-credentials
+authentication-tokens
+variant
+instance-identity
+
+############################
+# DOCKER
+############################
+docker-commons
+docker-workflow
+
+############################
+# BUILD TOOLS
+############################
+maven-plugin
+
+############################
+# QUALITY & ARTIFACTS
+############################
+sonar
+nexus-jenkins-plugin
+
+############################
+# UI / ICONS / FRONTEND APIs
+############################
+ionicons-api
+bootstrap5-api
+echarts-api
+prism-api
+checks-api
+plugin-util-api
+dev-tools-symbols-api
+
+############################
+# MAIL & NOTIFICATIONS
+############################
+mailer
+jakarta-mail-api
+display-url-api
+
+############################
+# JAVA / HTTP / UTILITY APIS
+############################
+apache-httpcomponents-client-4-api
+okhttp-api
+caffeine-api
+jackson2-api
+oss-symbols-api
+jsoup
+javadoc
+junit
+jsch
+struct
+durable-task
+
+############################
+# FOLDERS / ORGANIZATION
+############################
+cloudbees-folder

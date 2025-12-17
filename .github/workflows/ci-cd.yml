@@ -1,0 +1,113 @@
+name: CI/CD Pipeline for Student Management
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Build with Maven
+      run: mvn clean compile
+    
+    - name: Run tests
+      run: mvn test
+    
+    - name: Generate JaCoCo report
+      run: mvn jacoco:report
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results
+        path: target/surefire-reports/
+    
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: coverage-report
+        path: target/site/jacoco/
+  
+  sonarqube:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: SonarQube Scan
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      run: |
+        mvn sonar:sonar \
+          -Dsonar.projectKey=student-management \
+          -Dsonar.login=$SONAR_TOKEN \
+          -Dsonar.host.url=$SONAR_HOST_URL
+  
+  deploy:
+    needs: sonarqube
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Deploy to Nexus
+      env:
+        NEXUS_USER: ${{ secrets.NEXUS_USER }}
+        NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        NEXUS_URL: ${{ secrets.NEXUS_URL }}
+      run: |
+        # Configure Maven settings avec Nexus
+        cat > settings.xml << SETTINGS
+        <settings>
+          <servers>
+            <server>
+              <id>nexus-snapshots</id>
+              <username>$NEXUS_USER</username>
+              <password>$NEXUS_PASSWORD</password>
+            </server>
+          </servers>
+        </settings>
+        SETTINGS
+        
+        # Déploie sur Nexus
+        mvn deploy -DskipTests \
+          -DaltSnapshotDeploymentRepository=nexus-snapshots::default::$NEXUS_URL/repository/student-management-snapshots/ \
+          --settings settings.xml
+    
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: student-management-jar
+        path: target/*.jar

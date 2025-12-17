@@ -1,0 +1,25 @@
+FROM jenkins:lts
+ENV JAVA_OPTS="-Dhudson.model.DownloadService.noSignatureCheck=true"
+RUN 
+# Official Jenkins LTS image
+FROM jenkins/jenkins:lts-jdk17
+
+# Switch to root to install tools
+USER root
+
+# Install curl (needed by plugin manager)
+RUN apt-get update && apt-get install -y curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Switch back to jenkins user
+USER jenkins
+
+# Copy plugin list
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+
+# Install plugins + dependencies
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+# build image: docker build -t jenkins-fixed .
+# run container: docker run -d -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home --name jenkins jenkins-fixed
