@@ -91,7 +91,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    
+     
     - name: Deploy to Nexus
       env:
         NEXUS_USER: ${{ secrets.NEXUS_USER }}
